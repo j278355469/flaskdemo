@@ -1,6 +1,7 @@
 from flask import Flask,render_template, request
 from datetime import datetime 
 import pandas as pd
+import json
 
 
 
@@ -59,6 +60,30 @@ def get_BMI(name, h , w):
     
     return {'name':name,'height':h,'weight':w,'BMI':BMI}
 
+@app.route("/pm25-chart")
+def get_pm25_chart():
+    return render_template("pm25-chart.html")
+
+
+
+@app.route("/pm25-json")
+def get_pm25_josn():
+    url='https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=CSV'
+    df=pd.read_csv(url).dropna()
+
+    json_data={
+        "title": "PM2.5數據",
+        "xData": df['site'].tolist(),
+        "yData": df["pm25"].tolist(),
+    }
+    
+
+    return json.dumps(json_data,ensure_ascii=False)
+
+
+
+
+
 @app.route("/pm25",methods=['GET',"POST"])
 def get_pm25():
     global ascending
@@ -94,5 +119,11 @@ def get_pm25():
     return render_template("pm25.html",**locals())
 
 if __name__=='__main__':
+    
+
     app.run(debug=True)
 
+
+
+
+# https://github.com/17app001/flask-demo1/tree/master/templates
