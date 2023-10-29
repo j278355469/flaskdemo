@@ -9,12 +9,19 @@
 </head>
 
 <body>
-    <div class="hero-body has-background-primary">
+    <div class="hero-body has-background-warning">
 
         <h1 class="title is-size-1 has-text-centered">PM2.5及時資料</h1>
         <p class="box has-background-link has-text-white has-text-centered">更新時間:{{now}} {{message}}</p>
-
-        <table class="table is-fullwidth is-bordered is-striped is-hoverable has-background-warning" border="1">
+        <p>PM2.5 最大值的城市: {{ highes[0] }}<span class="has-text-danger-dark">{{ highes[1] }}</span> </p>
+        <p>PM2.5 最小值的城市: {{ lowest[0] }}<span class="has-text-success-dark">{{lowest[1]}}</span></p>
+        <form action="" method='POST'>
+            <input class="button has-background-link has-text-white" type="submit" name="update" value="更新"
+                onclick="this.form.submit()">
+            <input class="button has-background-link has-text-white" type="submit" name="sort" value="排序"
+                onclick="this.form.submit()">
+        </form>
+        <table class="table is-fullwidth is-bordered is-striped is-hoverable has-background-success" border="1">
             <thead>
                 <tr>
                     {% for columns in columns %}

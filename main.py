@@ -1,6 +1,9 @@
-from flask import Flask,render_template
+from flask import Flask,render_template, request
 from datetime import datetime 
 import pandas as pd
+
+
+
 app = Flask(__name__)
 today = datetime.now()
 
@@ -56,15 +59,31 @@ def get_BMI(name, h , w):
     
     return {'name':name,'height':h,'weight':w,'BMI':BMI}
 
-@app.route("/pm25")
+@app.route("/pm25",methods=['GET',"POST"])
 def get_pm25():
+    global ascending
     url='https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=CSV'
     
     now=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    sort = False
+    ascending = True
+    if request.method =="POST":
+        if request.form.get('sort'):
+            sort = True
+
+
     try:
         df=pd.read_csv(url).dropna()
+        if sort:
+            df = df.sort_values("pm25", ascending=ascending)
+            ascending=not ascending
+        else:
+            ascending = True
         columns=df.columns.tolist()
         values=df.values.tolist()
+        lowest=df.sort_values('pm25').iloc[0][['site','pm25']].values
+        highes=df.sort_values('pm25').iloc[-1][['site','pm25']].values
+        
         message="取得資料成功!"
         
     except Exception as e:
