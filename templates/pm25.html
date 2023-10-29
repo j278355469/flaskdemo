@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+
+<body>
+    <div class="hero-body has-background-primary">
+
+        <h1 class="title is-size-1 has-text-centered">PM2.5及時資料</h1>
+        <p class="box has-background-link has-text-white has-text-centered">更新時間:{{now}} {{message}}</p>
+
+        <table class="table is-fullwidth is-bordered is-striped is-hoverable has-background-warning" border="1">
+            <thead>
+                <tr>
+                    {% for columns in columns %}
+                    <th>{{columns}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for value in values %}
+                <tr>
+                    {% for row in value %}
+                    <td>{{row}}</td>
+                    {% endfor %}
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+</body>
+
+</html>
