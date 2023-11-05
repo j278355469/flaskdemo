@@ -12,29 +12,56 @@
 <body>
 
     <div id="main" style="width: 600px;height:400px;"></div>
+    <div id="six-county" style="width: 600px;height:400px;"></div>
     <!-- 使用ajax 進行資料取得後繪製 -->
     <script>
         const myChart = echarts.init(document.getElementById('main'));
+        const myChart2 = echarts.init(document.getElementById('six-county'));
         drawPM25();
 
-        function echartPic1(data) {
+        function echartSixPm25(result) {
             let option = {
                 title: {
-                    text: data["title"]
+                    text: '六都PM2.5平均值'
                 },
                 tooltip: {},
                 legend: {
                     data: ['PM2.5']
                 },
                 xAxis: {
-                    data: data['xData']
+                    data: Object.keys(result)
                 },
                 yAxis: {},
                 series: [
                     {
                         name: 'PM2.5',
                         type: 'bar',
-                        data: data['yData']
+                        data: Object.values(result)
+                    }
+                ]
+            };
+
+            myChart2.setOption(option);
+        }
+
+        function echartPic1(result) {
+            let option = {
+                title: {
+                    text: result["title"]
+                },
+                tooltip: {},
+                legend: {
+                    data: ['PM2.5']
+                },
+                xAxis: {
+                    data: result['xData']
+                },
+                yAxis: {},
+                series: [
+                    {
+                        name: 'PM2.5',
+                        type: 'bar',
+                        data: result['yData']
                     }
                 ]
             };
@@ -43,13 +70,13 @@
         }
 
 
-        function echartPic2(data) {
+        function echartPic2(result) {
             var option;
 
             // prettier-ignore
-            let dataAxis = data['xData'];
+            let dataAxis = result['xData'];
             // prettier-ignore
-            let data = data['yData']
+            let data = result['yData']
             let yMax = 500;
             let dataShadow = [];
             for (let i = 0; i < data.length; i++) {
@@ -57,7 +84,7 @@
             }
             option = {
                 title: {
-                    text: data['data'],
+                    text: result['result'],
                     subtext: 'Feature Sample: Gradient Color, Shadow, Click Zoom'
                 },
                 xAxis: {
@@ -136,9 +163,14 @@
                     url: "/pm25-json",
                     type: "GET",
                     dataType: "json",
-                    success: (data) => {
-                        console.log(data);
-                        echartPic1(data);
+                    success: (result) => {
+                        console.log(result);
+                        echartPic1(result);
+
+
+                        echartSixPm25(result["sixData"])
+
+
                     },
                     error: () => {
                         alert("取得資料失敗!");
