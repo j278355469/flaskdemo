@@ -13,16 +13,17 @@
 
     <div id="main" style="width: 600px;height:400px;"></div>
     <div id="six-county" style="width: 600px;height:400px;"></div>
+    <div id="county" style="width: 600px;height:400px;"></div>
     <!-- 使用ajax 進行資料取得後繪製 -->
     <script>
         const Chart1 = echarts.init(document.getElementById('main'));
         const Chart2 = echarts.init(document.getElementById('six-county'));
+        const Chart3 = echarts.init(document.getElementById('county'));
         drawPM25();
 
-        title = ['六都PM2.5平均值', result["title"]]
-        xdata = [Object.keys(result), result['xData']]
 
-        function chartpic(chart, title, label, xData, yData, color = "00008b") {
+
+        function chartpic(chart, title, label, xData, yData, color = "") {
             let option = {
                 title: {
                     text: title
@@ -49,6 +50,28 @@
             };
 
             chart.setOption(option);
+        }
+
+        function drawCountyPM25(county) {
+            $.ajax(
+                {
+                    url: "/county-pm25-json/" + county,
+                    type: "GET",
+                    dataType: "json",
+                    success: (result) => {
+                        console.log(result);
+                        chartpic(Chart3, county, 'PM2.5',
+                            Object.keys(result['pm25']),
+                            Object.values(result['pm25']),
+                            color = "d2ed6d",
+                        )
+                    },
+
+                    error: () => {
+                        alert("取得資料失敗!");
+                    }
+                }
+            )
         }
 
 
@@ -122,7 +145,9 @@
 
                         chartpic(Chart2, '六都PM2.5平均值', 'PM2.5',
                             Object.keys(result['sixData']),
-                            Object.values(result['sixData'], color = "ff69b4"))
+                            Object.values(result['sixData']), color = "ff69b4")
+
+                        drawCountyPM25("新北市");
 
 
                     },

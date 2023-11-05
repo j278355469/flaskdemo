@@ -9,6 +9,7 @@ app = Flask(__name__)
 today = datetime.now()
 
 books={1:"Python book",2:"Java book",3:"Flask book"}
+df=None
 #首頁
 @app.route("/index")
 @app.route("/")
@@ -66,8 +67,53 @@ def get_pm25_chart():
 
 
 
+@app.route("/county-pm25-json/<county>")
+def get_county_pm25_json(county):
+    global df
+    url='https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=CSV'
+    pm25 = {}
+    message = ""
+    try:
+        if df is None:
+            print('1')
+            df=pd.read_csv(url).dropna()
+
+
+        pm25=(
+        df.groupby('county')
+        .get_group(county)[['site','pm25']]
+        .set_index('site')
+        .to_dict()['pm25']
+        )
+
+        success = True
+    except Exception as e:
+        print(e)
+        message = str(e)
+        success = False
+
+
+    json_data={
+        "datatime":get_now(),
+        "success" : success, 
+        "title": county,
+        "pm25":pm25,
+        "message": message,
+        
+        
+    }
+
+    return json.dumps(json_data,ensure_ascii=False)
+
+def get_now():
+    now=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return now
+
+
+
 @app.route("/pm25-json")
 def get_pm25_josn():
+    global df
     url='https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=CSV'
     df=pd.read_csv(url).dropna()
     six_county=['新北市','臺北市','桃園市','臺中市','臺南市','高雄市']
