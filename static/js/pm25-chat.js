@@ -9,6 +9,11 @@ selectCountyE1.addEventListener("change", () => {
 
 
 });
+window.onresize = function () {
+    chart1.resize();
+    chart2.resize();
+    chart3.resize();
+}
 
 
 
@@ -46,12 +51,15 @@ function chartpic(chart, title, label, xData, yData, color = "") {
 }
 
 function drawCountyPM25(county) {
+    Chart3.showLoading();
+
     $.ajax(
         {
             url: "/county-pm25-json/" + county,
             type: "GET",
             dataType: "json",
             success: (result) => {
+                Chart3.hideLoading();
                 console.log(result);
                 chartpic(Chart3, county, 'PM2.5',
                     Object.keys(result['pm25']),
@@ -61,6 +69,7 @@ function drawCountyPM25(county) {
             },
 
             error: () => {
+                Chart3.hideLoading();
                 alert("取得資料失敗!");
             }
         }
@@ -122,12 +131,16 @@ function drawCountyPM25(county) {
 
 
 function drawPM25() {
+    Chart1.showLoading();
+    Chart2.showLoading();
     $.ajax(
         {
             url: "/pm25-json",
             type: "GET",
             dataType: "json",
             success: (result) => {
+                Chart1.hideLoading();
+                Chart2.hideLoading();
                 console.log(result);
 
                 chartpic(Chart1, result["title"], 'PM2.5',
@@ -143,6 +156,8 @@ function drawPM25() {
                 drawCountyPM25(result["county"]);
             },
             error: () => {
+                Chart1.hideLoading();
+                Chart2.hideLoading();
                 alert("取得資料失敗!");
             }
         }

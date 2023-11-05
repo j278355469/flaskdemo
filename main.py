@@ -76,7 +76,11 @@ def get_pm25_chart():
     highes=df.sort_values('pm25').iloc[-1][['site','pm25']].values
 
 
-    return render_template("pm25-chart.html", countys=countys,lowest=lowest,highes=highes)
+    return render_template("pm25-charts-bulma.html", 
+    countys=countys,
+    lowest=lowest,
+    highes=highes,
+    datatime =get_now(),)
 
 
 
