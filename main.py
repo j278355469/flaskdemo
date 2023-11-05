@@ -10,6 +10,8 @@ today = datetime.now()
 
 books={1:"Python book",2:"Java book",3:"Flask book"}
 df=None
+url='https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=CSV'
+countys=None
 #首頁
 @app.route("/index")
 @app.route("/")
@@ -63,14 +65,25 @@ def get_BMI(name, h , w):
 
 @app.route("/pm25-chart")
 def get_pm25_chart():
-    return render_template("pm25-chart.html")
+    global countys
+    df=pd.read_csv(url).dropna()
+
+    countys=list(set(df["county"]))
+
+
+
+    lowest=df.sort_values('pm25').iloc[0][['site','pm25']].values
+    highes=df.sort_values('pm25').iloc[-1][['site','pm25']].values
+
+
+    return render_template("pm25-chart.html", countys=countys,lowest=lowest,highes=highes)
 
 
 
 @app.route("/county-pm25-json/<county>")
 def get_county_pm25_json(county):
-    global df
-    url='https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=CSV'
+    global df,countys
+    
     pm25 = {}
     message = ""
     try:
@@ -99,6 +112,7 @@ def get_county_pm25_json(county):
         "title": county,
         "pm25":pm25,
         "message": message,
+        "county":countys[0]
         
         
     }
@@ -113,9 +127,9 @@ def get_now():
 
 @app.route("/pm25-json")
 def get_pm25_josn():
-    global df
-    url='https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=CSV'
-    df=pd.read_csv(url).dropna()
+    global df,countys
+    if df is None:
+        df=pd.read_csv(url).dropna()
     six_county=['新北市','臺北市','桃園市','臺中市','臺南市','高雄市']
 
     six_data={}
@@ -130,6 +144,7 @@ def get_pm25_josn():
         "xData": df['site'].tolist(),
         "yData": df["pm25"].tolist(),
         "sixData":six_data,
+        "county":countys[0]
     }
     
 
@@ -142,7 +157,6 @@ def get_pm25_josn():
 @app.route("/pm25",methods=['GET',"POST"])
 def get_pm25():
     global ascending
-    url='https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=CSV'
     
     now=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     sort = False

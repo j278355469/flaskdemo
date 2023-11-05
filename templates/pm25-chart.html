@@ -10,15 +10,34 @@
 </head>
 
 <body>
+    <p>PM2.5 最大值的城市: {{ highes[0] }}<span>{{ highes[1] }}</span> </p>
+    <p>PM2.5 最小值的城市: {{ lowest[0] }}<span>{{ lowest[1] }}</span></p>
 
     <div id="main" style="width: 600px;height:400px;"></div>
     <div id="six-county" style="width: 600px;height:400px;"></div>
+    <select name="selectCounty" id="selectCounty">
+        {% for county in countys %}
+        <option value="{{county}}">{{county}}</option>
+        {% endfor %}
+
+    </select>
     <div id="county" style="width: 600px;height:400px;"></div>
     <!-- 使用ajax 進行資料取得後繪製 -->
     <script>
         const Chart1 = echarts.init(document.getElementById('main'));
         const Chart2 = echarts.init(document.getElementById('six-county'));
         const Chart3 = echarts.init(document.getElementById('county'));
+        const selectCountyE1 = document.querySelector("#selectCounty")
+
+        selectCountyE1.addEventListener("change", () => {
+            console.log(selectCountyE1.value);
+            drawCountyPM25(selectCountyE1.value)
+
+
+        });
+
+
+
         drawPM25();
 
 
@@ -145,11 +164,9 @@
 
                         chartpic(Chart2, '六都PM2.5平均值', 'PM2.5',
                             Object.keys(result['sixData']),
-                            Object.values(result['sixData']), color = "ff69b4")
+                            Object.values(result['sixData']),)
 
-                        drawCountyPM25("新北市");
-
-
+                        drawCountyPM25(result["county"]);
                     },
                     error: () => {
                         alert("取得資料失敗!");
